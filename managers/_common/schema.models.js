@@ -131,5 +131,6 @@ module.exports = {
         path: 'role',
         type: 'string',
         length: { min: 3, max: 20 },
+        oneOf: ['superadmin', 'school_admin'],
     },
 }
