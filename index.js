@@ -3,6 +3,8 @@ const Cortex                = require('ion-cortex');
 const ManagersLoader        = require('./loaders/ManagersLoader.js');
 const Aeon                  = require('aeon-machine');
 
+require('./connect/mongo')({ uri: config.dotEnv.MONGO_URI });
+
 process.on('uncaughtException', err => {
     console.log(`Uncaught Exception:`)
     console.log(err, err.stack);
