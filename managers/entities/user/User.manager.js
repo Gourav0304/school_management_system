@@ -11,6 +11,9 @@ module.exports = class User {
   }
 
   async createUser({ username, email, password, role = 'school_admin', schoolId }) {
+    // Normalize schoolId — treat empty string as absent
+    if (!schoolId) schoolId = undefined;
+
     // Validation
     let result = await this.validators.user.createUser({ username, email, password, role, schoolId });
     if (result) return result;
