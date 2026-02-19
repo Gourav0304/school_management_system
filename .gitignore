@@ -92,3 +92,6 @@ sw.*
 # vscode
 .vscode/
 
+# Claude Code
+.claude/
+
