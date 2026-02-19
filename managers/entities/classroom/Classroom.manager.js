@@ -15,13 +15,12 @@ module.exports = class Classroom {
   async createClassroom({ __schoolAdmin, name, schoolId, capacity }) {
     if (!__schoolAdmin) return { error: 'unauthorized' };
 
-    // School admins can only create classrooms in their own school
     const adminSchoolId = __schoolAdmin.schoolId?.toString();
     if (__schoolAdmin.role === 'school_admin' && adminSchoolId !== schoolId) {
       return { error: 'forbidden: you can only manage your own school' };
     }
 
-    let result = await this.validators.classroom.createClassroom({ name, schoolId, capacity });
+    const result = await this.validators.classroom.createClassroom({ name, schoolId, capacity });
     if (result) return result;
 
     const classroom = await this.mongomodels.classroom.create({ name, schoolId, capacity });
@@ -35,7 +34,6 @@ module.exports = class Classroom {
     const classroom = await this.mongomodels.classroom.findById(id);
     if (!classroom) return { error: 'classroom not found' };
 
-    // School admins can only view their school's classrooms
     if (
       __schoolAdmin.role === 'school_admin' &&
       classroom.schoolId.toString() !== __schoolAdmin.schoolId?.toString()
@@ -74,7 +72,7 @@ module.exports = class Classroom {
       return { error: 'forbidden' };
     }
 
-    let result = await this.validators.classroom.updateClassroom({ name, capacity });
+    const result = await this.validators.classroom.updateClassroom({ name, capacity });
     if (result) return result;
 
     const updated = await this.mongomodels.classroom.findByIdAndUpdate(

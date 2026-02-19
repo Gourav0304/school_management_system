@@ -20,7 +20,7 @@ module.exports = class Student {
       return { error: 'forbidden: you can only manage your own school' };
     }
 
-    let result = await this.validators.student.createStudent({
+    const result = await this.validators.student.createStudent({
       name,
       email,
       age,
@@ -84,7 +84,7 @@ module.exports = class Student {
       return { error: 'forbidden' };
     }
 
-    let result = await this.validators.student.updateStudent({ name, email, age });
+    const result = await this.validators.student.updateStudent({ name, email, age });
     if (result) return result;
 
     const updated = await this.mongomodels.student.findByIdAndUpdate(
@@ -128,7 +128,7 @@ module.exports = class Student {
       return { error: 'forbidden' };
     }
 
-    let result = await this.validators.student.transferStudent({ schoolId, classroomId });
+    const result = await this.validators.student.transferStudent({ schoolId, classroomId });
     if (result) return result;
 
     const updated = await this.mongomodels.student.findByIdAndUpdate(

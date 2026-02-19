@@ -1,4 +1,4 @@
-const config         = require('./config/index.config.js');
+const config = require('./config/index.config.js');
 const ManagersLoader = require('./loaders/ManagersLoader.js');
 
 require('./connect/mongo')({ uri: config.dotEnv.MONGO_URI });
@@ -14,7 +14,6 @@ process.on('unhandledRejection', (reason, promise) => {
   process.exit(1);
 });
 
-// Redis not used — provide a no-op cortex so Api.manager.js doesn't crash
 const cortex = {
   sub: () => {},
   pub: () => {},

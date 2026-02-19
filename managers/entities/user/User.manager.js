@@ -11,21 +11,16 @@ module.exports = class User {
   }
 
   async createUser({ username, email, password, role = 'school_admin', schoolId }) {
-    // Normalize schoolId — treat empty string as absent
     if (!schoolId) schoolId = undefined;
 
-    // Validation
-    let result = await this.validators.user.createUser({ username, email, password, role, schoolId });
+    const result = await this.validators.user.createUser({ username, email, password, role, schoolId });
     if (result) return result;
 
-    // Check duplicate
     const existing = await this.mongomodels.user.findOne({ email });
     if (existing) return { error: 'email already in use' };
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Save user
     const user = await this.mongomodels.user.create({
       username,
       email,
@@ -48,8 +43,7 @@ module.exports = class User {
   }
 
   async login({ email, password }) {
-    // Validation
-    let result = await this.validators.user.login({ email, password });
+    const result = await this.validators.user.login({ email, password });
     if (result) return result;
 
     const user = await this.mongomodels.user.findOne({ email });

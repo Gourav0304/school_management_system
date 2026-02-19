@@ -17,12 +17,10 @@ module.exports = class UserServer {
     this.userApi = managers.userApi;
   }
 
-  /** for injecting middlewares */
   use(args) {
     app.use(args);
   }
 
-  /** server configs */
   run() {
     app.use(helmet());
     app.use(cors({ origin: '*' }));
@@ -31,16 +29,14 @@ module.exports = class UserServer {
     app.use('/static', express.static('public'));
     app.use('/api/', limiter);
 
-    /** an error handler */
     app.use((err, req, res, next) => {
       console.error(err.stack);
       res.status(500).send('Something broke!');
     });
 
-    /** a single middleware to handle all */
     app.all('/api/:moduleName/:fnName', this.userApi.mw);
 
-    let server = http.createServer(app);
+    const server = http.createServer(app);
     server.listen(this.config.dotEnv.USER_PORT, () => {
       console.log(
         `${this.config.dotEnv.SERVICE_NAME.toUpperCase()} is running on port: ${this.config.dotEnv.USER_PORT}`

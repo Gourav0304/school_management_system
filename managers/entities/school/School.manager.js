@@ -15,7 +15,7 @@ module.exports = class School {
   async createSchool({ __superAdmin, name, address, email, phone }) {
     if (!__superAdmin) return { error: 'unauthorized' };
 
-    let result = await this.validators.school.createSchool({ name, address, email, phone });
+    const result = await this.validators.school.createSchool({ name, address, email, phone });
     if (result) return result;
 
     const school = await this.mongomodels.school.create({ name, address, email, phone });
@@ -43,7 +43,7 @@ module.exports = class School {
     if (!__superAdmin) return { error: 'unauthorized' };
     if (!id) return { error: 'school id is required' };
 
-    let result = await this.validators.school.updateSchool({ name, address, email, phone });
+    const result = await this.validators.school.updateSchool({ name, address, email, phone });
     if (result) return result;
 
     const school = await this.mongomodels.school.findByIdAndUpdate(
