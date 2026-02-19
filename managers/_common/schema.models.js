@@ -102,4 +102,37 @@ module.exports = {
     bool: {
         type: 'Boolean',
     },
+    name: {
+        path: 'name',
+        type: 'string',
+        length: { min: 2, max: 100 },
+    },
+    address: {
+        path: 'address',
+        type: 'string',
+        length: { min: 3, max: 300 },
+    },
+    capacity: {
+        path: 'capacity',
+        type: 'number',
+    },
+    age: {
+        path: 'age',
+        type: 'number',
+    },
+    schoolId: {
+        path: 'schoolId',
+        type: 'string',
+        length: { min: 1, max: 50 },
+    },
+    classroomId: {
+        path: 'classroomId',
+        type: 'string',
+        length: { min: 1, max: 50 },
+    },
+    role: {
+        path: 'role',
+        type: 'string',
+        length: { min: 3, max: 20 },
+    },
 }
