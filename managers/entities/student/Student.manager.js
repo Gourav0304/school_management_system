@@ -59,10 +59,14 @@ module.exports = class Student {
   async listStudents({ __schoolAdmin, schoolId }) {
     if (!__schoolAdmin) return { error: 'unauthorized' };
 
-    const filterSchoolId =
-      __schoolAdmin.role === 'school_admin' ? __schoolAdmin.schoolId : schoolId;
+    const query = {};
+    if (__schoolAdmin.role === 'school_admin') {
+      query.schoolId = __schoolAdmin.schoolId;
+    } else if (schoolId) {
+      query.schoolId = schoolId;
+    }
 
-    const students = await this.mongomodels.student.find({ schoolId: filterSchoolId });
+    const students = await this.mongomodels.student.find(query);
     return { students };
   }
 

@@ -17,10 +17,14 @@
       "name": "Auth",
       "item": [
         {
-          "name": "Register User (Superadmin)",
+          "name": "Register Superadmin",
           "request": {
             "method": "POST",
-            "url": "{{base_url}}/api/user/createUser",
+            "url": {
+              "raw": "{{base_url}}/api/user/createUser",
+              "host": ["{{base_url}}"],
+              "path": ["api", "user", "createUser"]
+            },
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
@@ -44,33 +48,14 @@
           ]
         },
         {
-          "name": "Register School Admin",
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/user/createUser",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"username\": \"schooladmin\",\n  \"email\": \"schooladmin@test.com\",\n  \"password\": \"Admin1234\",\n  \"role\": \"school_admin\",\n  \"schoolId\": \"{{school_id}}\"\n}"
-            }
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "const res = pm.response.json();",
-                  "pm.test('Status ok', () => pm.expect(res.ok).to.be.true);"
-                ]
-              }
-            }
-          ]
-        },
-        {
           "name": "Login",
           "request": {
             "method": "POST",
-            "url": "{{base_url}}/api/user/login",
+            "url": {
+              "raw": "{{base_url}}/api/user/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "user", "login"]
+            },
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
@@ -97,7 +82,11 @@
           "name": "Get Short Token",
           "request": {
             "method": "POST",
-            "url": "{{base_url}}/api/token/v1_createShortToken",
+            "url": {
+              "raw": "{{base_url}}/api/token/v1_createShortToken",
+              "host": ["{{base_url}}"],
+              "path": ["api", "token", "v1_createShortToken"]
+            },
             "header": [{ "key": "token", "value": "{{long_token}}" }]
           },
           "event": [
@@ -115,6 +104,37 @@
               }
             }
           ]
+        },
+        {
+          "name": "Register School Admin",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/api/user/createUser",
+              "host": ["{{base_url}}"],
+              "path": ["api", "user", "createUser"]
+            },
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "token", "value": "{{short_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"schooladmin\",\n  \"email\": \"schooladmin@test.com\",\n  \"password\": \"Admin1234\",\n  \"role\": \"school_admin\",\n  \"schoolId\": \"{{school_id}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test('Status ok', () => pm.expect(res.ok).to.be.true);",
+                  "pm.test('User created', () => pm.expect(res.data).to.have.property('user'));"
+                ]
+              }
+            }
+          ]
         }
       ]
     },
@@ -125,7 +145,11 @@
           "name": "Create School",
           "request": {
             "method": "POST",
-            "url": "{{base_url}}/api/school/createSchool",
+            "url": {
+              "raw": "{{base_url}}/api/school/createSchool",
+              "host": ["{{base_url}}"],
+              "path": ["api", "school", "createSchool"]
+            },
             "header": [
               { "key": "Content-Type", "value": "application/json" },
               { "key": "token", "value": "{{short_token}}" }
@@ -155,7 +179,11 @@
           "name": "List Schools",
           "request": {
             "method": "GET",
-            "url": "{{base_url}}/api/school/listSchools",
+            "url": {
+              "raw": "{{base_url}}/api/school/listSchools",
+              "host": ["{{base_url}}"],
+              "path": ["api", "school", "listSchools"]
+            },
             "header": [{ "key": "token", "value": "{{short_token}}" }]
           },
           "event": [
@@ -176,7 +204,7 @@
           "request": {
             "method": "GET",
             "url": {
-              "raw": "{{base_url}}/api/school/getSchool",
+              "raw": "{{base_url}}/api/school/getSchool?id={{school_id}}",
               "host": ["{{base_url}}"],
               "path": ["api", "school", "getSchool"],
               "query": [{ "key": "id", "value": "{{school_id}}" }]
@@ -189,7 +217,8 @@
               "script": {
                 "exec": [
                   "const res = pm.response.json();",
-                  "pm.test('Status ok', () => pm.expect(res.ok).to.be.true);"
+                  "pm.test('Status ok', () => pm.expect(res.ok).to.be.true);",
+                  "pm.test('Returns school', () => pm.expect(res.data).to.have.property('school'));"
                 ]
               }
             }
@@ -199,7 +228,11 @@
           "name": "Update School",
           "request": {
             "method": "POST",
-            "url": "{{base_url}}/api/school/updateSchool",
+            "url": {
+              "raw": "{{base_url}}/api/school/updateSchool",
+              "host": ["{{base_url}}"],
+              "path": ["api", "school", "updateSchool"]
+            },
             "header": [
               { "key": "Content-Type", "value": "application/json" },
               { "key": "token", "value": "{{short_token}}" }
@@ -215,7 +248,8 @@
               "script": {
                 "exec": [
                   "const res = pm.response.json();",
-                  "pm.test('Status ok', () => pm.expect(res.ok).to.be.true);"
+                  "pm.test('Status ok', () => pm.expect(res.ok).to.be.true);",
+                  "pm.test('Returns updated school', () => pm.expect(res.data).to.have.property('school'));"
                 ]
               }
             }
@@ -225,7 +259,11 @@
           "name": "Delete School",
           "request": {
             "method": "POST",
-            "url": "{{base_url}}/api/school/deleteSchool",
+            "url": {
+              "raw": "{{base_url}}/api/school/deleteSchool",
+              "host": ["{{base_url}}"],
+              "path": ["api", "school", "deleteSchool"]
+            },
             "header": [
               { "key": "Content-Type", "value": "application/json" },
               { "key": "token", "value": "{{short_token}}" }
@@ -256,7 +294,11 @@
           "name": "Create Classroom",
           "request": {
             "method": "POST",
-            "url": "{{base_url}}/api/classroom/createClassroom",
+            "url": {
+              "raw": "{{base_url}}/api/classroom/createClassroom",
+              "host": ["{{base_url}}"],
+              "path": ["api", "classroom", "createClassroom"]
+            },
             "header": [
               { "key": "Content-Type", "value": "application/json" },
               { "key": "token", "value": "{{short_token}}" }
@@ -275,7 +317,8 @@
                   "if (res.ok && res.data.classroom) {",
                   "  pm.collectionVariables.set('classroom_id', res.data.classroom._id);",
                   "}",
-                  "pm.test('Status ok', () => pm.expect(res.ok).to.be.true);"
+                  "pm.test('Status ok', () => pm.expect(res.ok).to.be.true);",
+                  "pm.test('Classroom created', () => pm.expect(res.data).to.have.property('classroom'));"
                 ]
               }
             }
@@ -285,8 +328,99 @@
           "name": "List Classrooms",
           "request": {
             "method": "GET",
-            "url": "{{base_url}}/api/classroom/listClassrooms",
+            "url": {
+              "raw": "{{base_url}}/api/classroom/listClassrooms",
+              "host": ["{{base_url}}"],
+              "path": ["api", "classroom", "listClassrooms"]
+            },
             "header": [{ "key": "token", "value": "{{short_token}}" }]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test('Status ok', () => pm.expect(res.ok).to.be.true);",
+                  "pm.test('Returns classrooms array', () => pm.expect(res.data.classrooms).to.be.an('array'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Classroom",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/classroom/getClassroom?id={{classroom_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "classroom", "getClassroom"],
+              "query": [{ "key": "id", "value": "{{classroom_id}}" }]
+            },
+            "header": [{ "key": "token", "value": "{{short_token}}" }]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test('Status ok', () => pm.expect(res.ok).to.be.true);",
+                  "pm.test('Returns classroom', () => pm.expect(res.data).to.have.property('classroom'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Classroom",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/api/classroom/updateClassroom",
+              "host": ["{{base_url}}"],
+              "path": ["api", "classroom", "updateClassroom"]
+            },
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "token", "value": "{{short_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{classroom_id}}\",\n  \"name\": \"Updated Room\",\n  \"capacity\": 40\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test('Status ok', () => pm.expect(res.ok).to.be.true);",
+                  "pm.test('Returns updated classroom', () => pm.expect(res.data).to.have.property('classroom'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Classroom",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/api/classroom/deleteClassroom",
+              "host": ["{{base_url}}"],
+              "path": ["api", "classroom", "deleteClassroom"]
+            },
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "token", "value": "{{short_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{classroom_id}}\"\n}"
+            }
           },
           "event": [
             {
@@ -299,47 +433,6 @@
               }
             }
           ]
-        },
-        {
-          "name": "Get Classroom",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{base_url}}/api/classroom/getClassroom",
-              "query": [{ "key": "id", "value": "{{classroom_id}}" }]
-            },
-            "header": [{ "key": "token", "value": "{{short_token}}" }]
-          }
-        },
-        {
-          "name": "Update Classroom",
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/classroom/updateClassroom",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "token", "value": "{{short_token}}" }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"id\": \"{{classroom_id}}\",\n  \"name\": \"Updated Room\",\n  \"capacity\": 40\n}"
-            }
-          }
-        },
-        {
-          "name": "Delete Classroom",
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/classroom/deleteClassroom",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "token", "value": "{{short_token}}" }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"id\": \"{{classroom_id}}\"\n}"
-            }
-          }
         }
       ]
     },
@@ -350,7 +443,11 @@
           "name": "Create Student",
           "request": {
             "method": "POST",
-            "url": "{{base_url}}/api/student/createStudent",
+            "url": {
+              "raw": "{{base_url}}/api/student/createStudent",
+              "host": ["{{base_url}}"],
+              "path": ["api", "student", "createStudent"]
+            },
             "header": [
               { "key": "Content-Type", "value": "application/json" },
               { "key": "token", "value": "{{short_token}}" }
@@ -369,7 +466,8 @@
                   "if (res.ok && res.data.student) {",
                   "  pm.collectionVariables.set('student_id', res.data.student._id);",
                   "}",
-                  "pm.test('Status ok', () => pm.expect(res.ok).to.be.true);"
+                  "pm.test('Status ok', () => pm.expect(res.ok).to.be.true);",
+                  "pm.test('Student created', () => pm.expect(res.data).to.have.property('student'));"
                 ]
               }
             }
@@ -379,26 +477,60 @@
           "name": "List Students",
           "request": {
             "method": "GET",
-            "url": "{{base_url}}/api/student/listStudents",
+            "url": {
+              "raw": "{{base_url}}/api/student/listStudents",
+              "host": ["{{base_url}}"],
+              "path": ["api", "student", "listStudents"]
+            },
             "header": [{ "key": "token", "value": "{{short_token}}" }]
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test('Status ok', () => pm.expect(res.ok).to.be.true);",
+                  "pm.test('Returns students array', () => pm.expect(res.data.students).to.be.an('array'));"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "Get Student",
           "request": {
             "method": "GET",
             "url": {
-              "raw": "{{base_url}}/api/student/getStudent",
+              "raw": "{{base_url}}/api/student/getStudent?id={{student_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "student", "getStudent"],
               "query": [{ "key": "id", "value": "{{student_id}}" }]
             },
             "header": [{ "key": "token", "value": "{{short_token}}" }]
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test('Status ok', () => pm.expect(res.ok).to.be.true);",
+                  "pm.test('Returns student', () => pm.expect(res.data).to.have.property('student'));"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "Update Student",
           "request": {
             "method": "POST",
-            "url": "{{base_url}}/api/student/updateStudent",
+            "url": {
+              "raw": "{{base_url}}/api/student/updateStudent",
+              "host": ["{{base_url}}"],
+              "path": ["api", "student", "updateStudent"]
+            },
             "header": [
               { "key": "Content-Type", "value": "application/json" },
               { "key": "token", "value": "{{short_token}}" }
@@ -407,13 +539,29 @@
               "mode": "raw",
               "raw": "{\n  \"id\": \"{{student_id}}\",\n  \"name\": \"John Updated\",\n  \"age\": 16\n}"
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test('Status ok', () => pm.expect(res.ok).to.be.true);",
+                  "pm.test('Returns updated student', () => pm.expect(res.data).to.have.property('student'));"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "Transfer Student",
           "request": {
             "method": "POST",
-            "url": "{{base_url}}/api/student/transferStudent",
+            "url": {
+              "raw": "{{base_url}}/api/student/transferStudent",
+              "host": ["{{base_url}}"],
+              "path": ["api", "student", "transferStudent"]
+            },
             "header": [
               { "key": "Content-Type", "value": "application/json" },
               { "key": "token", "value": "{{short_token}}" }
@@ -422,13 +570,29 @@
               "mode": "raw",
               "raw": "{\n  \"id\": \"{{student_id}}\",\n  \"schoolId\": \"{{school_id}}\",\n  \"classroomId\": \"{{classroom_id}}\"\n}"
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test('Status ok', () => pm.expect(res.ok).to.be.true);",
+                  "pm.test('Returns transferred student', () => pm.expect(res.data).to.have.property('student'));"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "Delete Student",
           "request": {
             "method": "POST",
-            "url": "{{base_url}}/api/student/deleteStudent",
+            "url": {
+              "raw": "{{base_url}}/api/student/deleteStudent",
+              "host": ["{{base_url}}"],
+              "path": ["api", "student", "deleteStudent"]
+            },
             "header": [
               { "key": "Content-Type", "value": "application/json" },
               { "key": "token", "value": "{{short_token}}" }
@@ -437,7 +601,18 @@
               "mode": "raw",
               "raw": "{\n  \"id\": \"{{student_id}}\"\n}"
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test('Status ok', () => pm.expect(res.ok).to.be.true);"
+                ]
+              }
+            }
+          ]
         }
       ]
     }

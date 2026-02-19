@@ -49,11 +49,14 @@ module.exports = class Classroom {
   async listClassrooms({ __schoolAdmin, schoolId }) {
     if (!__schoolAdmin) return { error: 'unauthorized' };
 
-    // School admins can only list their own school's classrooms
-    const filterSchoolId =
-      __schoolAdmin.role === 'school_admin' ? __schoolAdmin.schoolId : schoolId;
+    const query = {};
+    if (__schoolAdmin.role === 'school_admin') {
+      query.schoolId = __schoolAdmin.schoolId;
+    } else if (schoolId) {
+      query.schoolId = schoolId;
+    }
 
-    const classrooms = await this.mongomodels.classroom.find({ schoolId: filterSchoolId });
+    const classrooms = await this.mongomodels.classroom.find(query);
     return { classrooms };
   }
 
