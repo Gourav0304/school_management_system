@@ -1,0 +1,445 @@
+{
+  "info": {
+    "name": "School Management System API",
+    "description": "API collection for the School Management System built on Axion template.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:5111" },
+    { "key": "long_token", "value": "" },
+    { "key": "short_token", "value": "" },
+    { "key": "school_id", "value": "" },
+    { "key": "classroom_id", "value": "" },
+    { "key": "student_id", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register User (Superadmin)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/user/createUser",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"superadmin\",\n  \"email\": \"admin@test.com\",\n  \"password\": \"Admin1234\",\n  \"role\": \"superadmin\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.ok && res.data.longToken) {",
+                  "  pm.collectionVariables.set('long_token', res.data.longToken);",
+                  "}",
+                  "pm.test('Status ok', () => pm.expect(res.ok).to.be.true);",
+                  "pm.test('Returns longToken', () => pm.expect(res.data).to.have.property('longToken'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Register School Admin",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/user/createUser",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"schooladmin\",\n  \"email\": \"schooladmin@test.com\",\n  \"password\": \"Admin1234\",\n  \"role\": \"school_admin\",\n  \"schoolId\": \"{{school_id}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test('Status ok', () => pm.expect(res.ok).to.be.true);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/user/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@test.com\",\n  \"password\": \"Admin1234\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.ok && res.data.longToken) {",
+                  "  pm.collectionVariables.set('long_token', res.data.longToken);",
+                  "}",
+                  "pm.test('Status ok', () => pm.expect(res.ok).to.be.true);",
+                  "pm.test('Returns longToken', () => pm.expect(res.data).to.have.property('longToken'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Short Token",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/token/v1_createShortToken",
+            "header": [{ "key": "token", "value": "{{long_token}}" }]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.ok && res.data.shortToken) {",
+                  "  pm.collectionVariables.set('short_token', res.data.shortToken);",
+                  "}",
+                  "pm.test('Status ok', () => pm.expect(res.ok).to.be.true);",
+                  "pm.test('Returns shortToken', () => pm.expect(res.data).to.have.property('shortToken'));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Schools",
+      "item": [
+        {
+          "name": "Create School",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/school/createSchool",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "token", "value": "{{short_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test School\",\n  \"address\": \"123 Main Street\",\n  \"email\": \"school@test.com\",\n  \"phone\": \"0123456789012\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.ok && res.data.school) {",
+                  "  pm.collectionVariables.set('school_id', res.data.school._id);",
+                  "}",
+                  "pm.test('Status ok', () => pm.expect(res.ok).to.be.true);",
+                  "pm.test('School created', () => pm.expect(res.data).to.have.property('school'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Schools",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/school/listSchools",
+            "header": [{ "key": "token", "value": "{{short_token}}" }]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test('Status ok', () => pm.expect(res.ok).to.be.true);",
+                  "pm.test('Returns schools array', () => pm.expect(res.data.schools).to.be.an('array'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get School",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/school/getSchool",
+              "host": ["{{base_url}}"],
+              "path": ["api", "school", "getSchool"],
+              "query": [{ "key": "id", "value": "{{school_id}}" }]
+            },
+            "header": [{ "key": "token", "value": "{{short_token}}" }]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test('Status ok', () => pm.expect(res.ok).to.be.true);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update School",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/school/updateSchool",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "token", "value": "{{short_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{school_id}}\",\n  \"name\": \"Updated School Name\",\n  \"address\": \"456 New Street\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test('Status ok', () => pm.expect(res.ok).to.be.true);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete School",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/school/deleteSchool",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "token", "value": "{{short_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{school_id}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test('Status ok', () => pm.expect(res.ok).to.be.true);"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Classrooms",
+      "item": [
+        {
+          "name": "Create Classroom",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/classroom/createClassroom",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "token", "value": "{{short_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Room A\",\n  \"schoolId\": \"{{school_id}}\",\n  \"capacity\": 30\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.ok && res.data.classroom) {",
+                  "  pm.collectionVariables.set('classroom_id', res.data.classroom._id);",
+                  "}",
+                  "pm.test('Status ok', () => pm.expect(res.ok).to.be.true);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Classrooms",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/classroom/listClassrooms",
+            "header": [{ "key": "token", "value": "{{short_token}}" }]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test('Status ok', () => pm.expect(res.ok).to.be.true);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Classroom",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/classroom/getClassroom",
+              "query": [{ "key": "id", "value": "{{classroom_id}}" }]
+            },
+            "header": [{ "key": "token", "value": "{{short_token}}" }]
+          }
+        },
+        {
+          "name": "Update Classroom",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/classroom/updateClassroom",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "token", "value": "{{short_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{classroom_id}}\",\n  \"name\": \"Updated Room\",\n  \"capacity\": 40\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Classroom",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/classroom/deleteClassroom",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "token", "value": "{{short_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{classroom_id}}\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Students",
+      "item": [
+        {
+          "name": "Create Student",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/student/createStudent",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "token", "value": "{{short_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@test.com\",\n  \"age\": 15,\n  \"schoolId\": \"{{school_id}}\",\n  \"classroomId\": \"{{classroom_id}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.ok && res.data.student) {",
+                  "  pm.collectionVariables.set('student_id', res.data.student._id);",
+                  "}",
+                  "pm.test('Status ok', () => pm.expect(res.ok).to.be.true);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Students",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/student/listStudents",
+            "header": [{ "key": "token", "value": "{{short_token}}" }]
+          }
+        },
+        {
+          "name": "Get Student",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/student/getStudent",
+              "query": [{ "key": "id", "value": "{{student_id}}" }]
+            },
+            "header": [{ "key": "token", "value": "{{short_token}}" }]
+          }
+        },
+        {
+          "name": "Update Student",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/student/updateStudent",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "token", "value": "{{short_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{student_id}}\",\n  \"name\": \"John Updated\",\n  \"age\": 16\n}"
+            }
+          }
+        },
+        {
+          "name": "Transfer Student",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/student/transferStudent",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "token", "value": "{{short_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{student_id}}\",\n  \"schoolId\": \"{{school_id}}\",\n  \"classroomId\": \"{{classroom_id}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Student",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/student/deleteStudent",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "token", "value": "{{short_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{student_id}}\"\n}"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
